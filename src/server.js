@@ -11,7 +11,7 @@ const clientRouter = require('./leads/clientRouter');
 const { globalErrorMiddleware } = require('./utils/errorHandler');
 
 const app = express();
-const PORT = config.server.port || 3000;
+const PORT = process.env.PORT || config.server.port || 3000;
 
 // ── Middleware ──────────────────────────────────────────────────────────
 
