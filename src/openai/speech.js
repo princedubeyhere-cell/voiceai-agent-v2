@@ -6,7 +6,7 @@
 
 const OpenAI = require('openai');
 const fs = require('fs');
-const config = require('../../config/config.json');
+const config = require('../config');
 const { withTimeout } = require('../utils/timeoutPromise');
 const { withRetry } = require('../utils/rateLimiter');
 

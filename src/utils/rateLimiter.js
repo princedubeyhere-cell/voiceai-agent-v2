@@ -3,7 +3,7 @@
  * Wraps OpenAI API calls to handle rate limits gracefully.
  */
 
-const config = require('../../config/config.json');
+const config = require('../config');
 
 const MAX_RETRIES = config.openai.maxRetries || 3;
 const BASE_DELAY = config.openai.retryBaseDelay || 1000;

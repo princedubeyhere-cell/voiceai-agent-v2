@@ -8,7 +8,7 @@ const path = require('path');
 const { validateClientProfile } = require('../utils/validator');
 const { asyncHandler } = require('../utils/errorHandler');
 const { listClients } = require('../agents/personaManager');
-const config = require('../../config/config.json');
+const config = require('../config');
 
 const CLIENTS_DIR = path.resolve(__dirname, '../../', config.paths.clients);
 const router = Router();

@@ -4,7 +4,7 @@
  * Prevents context bloat and LLM confusion in long calls.
  */
 
-const config = require('../../config/config.json');
+const config = require('../config');
 
 const MAX_TURNS = config.call.memoryWindowTurns || 6;
 

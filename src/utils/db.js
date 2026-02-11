@@ -6,7 +6,7 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
-const config = require('../../config/config.json');
+const config = require('../config');
 
 const DB_PATH = path.resolve(__dirname, '../../', config.paths.database);
 
@@ -89,24 +89,24 @@ db.exec(`
 // ── Prepared Statements ────────────────────────────────────────────────────
 
 const stmts = {
-    insertLead: db.prepare(`
+  insertLead: db.prepare(`
     INSERT INTO leads (id, client_id, name, phone, email, budget, requirement, notes, status)
     VALUES (@id, @clientId, @name, @phone, @email, @budget, @requirement, @notes, @status)
   `),
 
-    updateLeadStatus: db.prepare(`
+  updateLeadStatus: db.prepare(`
     UPDATE leads SET status = @status, updated_at = datetime('now') WHERE id = @id
   `),
 
-    getLead: db.prepare(`SELECT * FROM leads WHERE id = ?`),
+  getLead: db.prepare(`SELECT * FROM leads WHERE id = ?`),
 
-    insertCallLog: db.prepare(`
+  insertCallLog: db.prepare(`
     INSERT INTO call_logs (lead_id, role, message, state) VALUES (@leadId, @role, @message, @state)
   `),
 
-    getCallLogs: db.prepare(`SELECT * FROM call_logs WHERE lead_id = ? ORDER BY id ASC`),
+  getCallLogs: db.prepare(`SELECT * FROM call_logs WHERE lead_id = ? ORDER BY id ASC`),
 
-    upsertOutcome: db.prepare(`
+  upsertOutcome: db.prepare(`
     INSERT INTO call_outcomes (lead_id, client_id, qualification, budget, requirement, sentiment, next_action, summary, call_duration_seconds, total_turns, fallbacks_used)
     VALUES (@leadId, @clientId, @qualification, @budget, @requirement, @sentiment, @nextAction, @summary, @callDuration, @totalTurns, @fallbacksUsed)
     ON CONFLICT(lead_id) DO UPDATE SET
@@ -116,15 +116,15 @@ const stmts = {
       fallbacks_used = @fallbacksUsed, completed_at = datetime('now')
   `),
 
-    getOutcome: db.prepare(`SELECT * FROM call_outcomes WHERE lead_id = ?`),
+  getOutcome: db.prepare(`SELECT * FROM call_outcomes WHERE lead_id = ?`),
 
-    insertCallPath: db.prepare(`
+  insertCallPath: db.prepare(`
     INSERT INTO call_paths (lead_id, state) VALUES (@leadId, @state)
   `),
 
-    getCallPath: db.prepare(`SELECT * FROM call_paths WHERE lead_id = ? ORDER BY id ASC`),
+  getCallPath: db.prepare(`SELECT * FROM call_paths WHERE lead_id = ? ORDER BY id ASC`),
 
-    upsertQualityScore: db.prepare(`
+  upsertQualityScore: db.prepare(`
     INSERT INTO quality_scores (lead_id, score, fallback_count, interrupt_count, state_errors, call_length_seconds, completed_flow, details)
     VALUES (@leadId, @score, @fallbackCount, @interruptCount, @stateErrors, @callLength, @completedFlow, @details)
     ON CONFLICT(lead_id) DO UPDATE SET
@@ -133,92 +133,92 @@ const stmts = {
       completed_flow = @completedFlow, details = @details, scored_at = datetime('now')
   `),
 
-    getQualityScore: db.prepare(`SELECT * FROM quality_scores WHERE lead_id = ?`),
+  getQualityScore: db.prepare(`SELECT * FROM quality_scores WHERE lead_id = ?`),
 };
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
 module.exports = {
-    // Leads
-    insertLead(lead) {
-        return stmts.insertLead.run({
-            id: lead.id,
-            clientId: lead.clientId,
-            name: lead.name,
-            phone: lead.phone,
-            email: lead.email || '',
-            budget: lead.budget || '',
-            requirement: lead.requirement || '',
-            notes: lead.notes || '',
-            status: lead.status || 'new',
-        });
-    },
+  // Leads
+  insertLead(lead) {
+    return stmts.insertLead.run({
+      id: lead.id,
+      clientId: lead.clientId,
+      name: lead.name,
+      phone: lead.phone,
+      email: lead.email || '',
+      budget: lead.budget || '',
+      requirement: lead.requirement || '',
+      notes: lead.notes || '',
+      status: lead.status || 'new',
+    });
+  },
 
-    updateLeadStatus(id, status) {
-        return stmts.updateLeadStatus.run({ id, status });
-    },
+  updateLeadStatus(id, status) {
+    return stmts.updateLeadStatus.run({ id, status });
+  },
 
-    getLead(id) {
-        return stmts.getLead.get(id);
-    },
+  getLead(id) {
+    return stmts.getLead.get(id);
+  },
 
-    // Call Logs
-    insertCallLog(leadId, role, message, state = '') {
-        return stmts.insertCallLog.run({ leadId, role, message, state });
-    },
+  // Call Logs
+  insertCallLog(leadId, role, message, state = '') {
+    return stmts.insertCallLog.run({ leadId, role, message, state });
+  },
 
-    getCallLogs(leadId) {
-        return stmts.getCallLogs.all(leadId);
-    },
+  getCallLogs(leadId) {
+    return stmts.getCallLogs.all(leadId);
+  },
 
-    // Outcomes
-    upsertOutcome(outcome) {
-        return stmts.upsertOutcome.run({
-            leadId: outcome.leadId,
-            clientId: outcome.clientId,
-            qualification: outcome.qualification || '',
-            budget: outcome.budget || '',
-            requirement: outcome.requirement || '',
-            sentiment: outcome.sentiment || '',
-            nextAction: outcome.nextAction || '',
-            summary: outcome.summary || '',
-            callDuration: outcome.callDuration || 0,
-            totalTurns: outcome.totalTurns || 0,
-            fallbacksUsed: outcome.fallbacksUsed || 0,
-        });
-    },
+  // Outcomes
+  upsertOutcome(outcome) {
+    return stmts.upsertOutcome.run({
+      leadId: outcome.leadId,
+      clientId: outcome.clientId,
+      qualification: outcome.qualification || '',
+      budget: outcome.budget || '',
+      requirement: outcome.requirement || '',
+      sentiment: outcome.sentiment || '',
+      nextAction: outcome.nextAction || '',
+      summary: outcome.summary || '',
+      callDuration: outcome.callDuration || 0,
+      totalTurns: outcome.totalTurns || 0,
+      fallbacksUsed: outcome.fallbacksUsed || 0,
+    });
+  },
 
-    getOutcome(leadId) {
-        return stmts.getOutcome.get(leadId);
-    },
+  getOutcome(leadId) {
+    return stmts.getOutcome.get(leadId);
+  },
 
-    // Call Paths
-    insertCallPath(leadId, state) {
-        return stmts.insertCallPath.run({ leadId, state });
-    },
+  // Call Paths
+  insertCallPath(leadId, state) {
+    return stmts.insertCallPath.run({ leadId, state });
+  },
 
-    getCallPath(leadId) {
-        return stmts.getCallPath.all(leadId);
-    },
+  getCallPath(leadId) {
+    return stmts.getCallPath.all(leadId);
+  },
 
-    // Quality Scores
-    upsertQualityScore(data) {
-        return stmts.upsertQualityScore.run({
-            leadId: data.leadId,
-            score: data.score,
-            fallbackCount: data.fallbackCount || 0,
-            interruptCount: data.interruptCount || 0,
-            stateErrors: data.stateErrors || 0,
-            callLength: data.callLength || 0,
-            completedFlow: data.completedFlow ? 1 : 0,
-            details: JSON.stringify(data.details || {}),
-        });
-    },
+  // Quality Scores
+  upsertQualityScore(data) {
+    return stmts.upsertQualityScore.run({
+      leadId: data.leadId,
+      score: data.score,
+      fallbackCount: data.fallbackCount || 0,
+      interruptCount: data.interruptCount || 0,
+      stateErrors: data.stateErrors || 0,
+      callLength: data.callLength || 0,
+      completedFlow: data.completedFlow ? 1 : 0,
+      details: JSON.stringify(data.details || {}),
+    });
+  },
 
-    getQualityScore(leadId) {
-        return stmts.getQualityScore.get(leadId);
-    },
+  getQualityScore(leadId) {
+    return stmts.getQualityScore.get(leadId);
+  },
 
-    // Raw access for special queries
-    raw: db,
+  // Raw access for special queries
+  raw: db,
 };

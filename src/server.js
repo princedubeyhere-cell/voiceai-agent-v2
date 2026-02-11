@@ -5,7 +5,7 @@
 
 const express = require('express');
 const cors = require('cors');
-const config = require('../config/config.json');
+const config = require('./config');
 const leadRouter = require('./leads/leadRouter');
 const clientRouter = require('./leads/clientRouter');
 const { globalErrorMiddleware } = require('./utils/errorHandler');

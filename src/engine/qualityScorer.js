@@ -4,7 +4,7 @@
  * Stores results in SQLite for analytics.
  */
 
-const config = require('../../config/config.json');
+const config = require('../config');
 const db = require('../utils/db');
 
 const SCORING = config.qualityScoring || {};

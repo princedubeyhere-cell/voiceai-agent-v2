@@ -6,7 +6,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const config = require('../../config/config.json');
+const config = require('../config');
 
 const CLIENTS_DIR = path.resolve(__dirname, '../../', config.paths.clients);
 

@@ -4,7 +4,7 @@
  * Gracefully ends the call and triggers summary generation.
  */
 
-const config = require('../../config/config.json');
+const config = require('../config');
 
 const DEFAULT_MAX_SECONDS = config.call.maxDurationSeconds || 90;
 
