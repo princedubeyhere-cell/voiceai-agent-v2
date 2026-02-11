@@ -1,0 +1,22 @@
+{
+  "name": "voiceai-agent",
+  "version": "1.0.0",
+  "description": "Multi-client, multi-industry AI calling agent system powered by OpenAI",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "simulate": "node src/simulator/simulator.js"
+  },
+  "keywords": ["voice-ai", "calling-agent", "openai", "multi-client"],
+  "author": "Prince",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "multer": "^1.4.5-lts.1",
+    "openai": "^4.77.0",
+    "uuid": "^11.0.0"
+  }
+}

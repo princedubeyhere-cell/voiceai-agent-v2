@@ -1,0 +1,25 @@
+{
+    "forbidden_topics": [
+        "guaranteed salary after placement",
+        "specific company hiring promises",
+        "competitor defamation"
+    ],
+    "forbidden_actions": [
+        "guarantee job placement",
+        "promise specific salary figures",
+        "claim 100% placement rate",
+        "compare negatively with named competitors"
+    ],
+    "compliance_rules": [
+        "Always mention that placement is subject to student performance",
+        "Course fees and schedules are subject to change",
+        "Scholarships are subject to eligibility criteria",
+        "Never share other students' personal information"
+    ],
+    "tone_restrictions": [
+        "Avoid high-pressure sales tactics",
+        "Do not create artificial urgency with fake deadlines",
+        "Be honest about course difficulty"
+    ],
+    "max_promises": "Do not guarantee specific job outcomes, salary figures, or placement timelines."
+}

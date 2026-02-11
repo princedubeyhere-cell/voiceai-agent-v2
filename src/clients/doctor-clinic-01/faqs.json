@@ -1,0 +1,26 @@
+[
+    {
+        "q": "What specialties do you offer?",
+        "a": "We have specialists in General Medicine, Orthopedics, Dermatology, Cardiology, Pediatrics, Gynecology, and ENT. We can help match you with the right doctor based on your concern."
+    },
+    {
+        "q": "What are your clinic hours?",
+        "a": "We are open Monday to Saturday, 9 AM to 8 PM. Sunday consultations are available by appointment only."
+    },
+    {
+        "q": "Do you accept insurance?",
+        "a": "Yes, we accept most major insurance plans. I can verify your coverage when we schedule your appointment. Please have your insurance card ready."
+    },
+    {
+        "q": "How much does a consultation cost?",
+        "a": "Our consultation fees vary by specialty, starting from $50 for general medicine. I can give you the exact fee once we identify the right specialist for your needs."
+    },
+    {
+        "q": "Can I get an online consultation?",
+        "a": "Yes, we offer telemedicine consultations through video call. It's very convenient and you'll receive a prescription via email after the consultation."
+    },
+    {
+        "q": "Do I need any reports before visiting?",
+        "a": "For a first-time visit, just bring any existing medical reports or prescriptions if you have them. If specific tests are needed, the doctor will guide you during the consultation."
+    }
+]

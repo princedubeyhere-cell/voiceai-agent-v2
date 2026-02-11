@@ -1,0 +1,22 @@
+{
+    "forbidden_topics": [
+        "political situations in destinations",
+        "religious advice",
+        "competitor pricing details"
+    ],
+    "forbidden_actions": [
+        "guarantee specific weather conditions",
+        "promise visa approval",
+        "confirm hotel without booking"
+    ],
+    "compliance_rules": [
+        "Always mention that prices are subject to availability",
+        "Never guarantee specific room or seat assignments",
+        "Travel insurance recommendations should not be presented as mandatory"
+    ],
+    "tone_restrictions": [
+        "Never pressure the customer to book immediately",
+        "Avoid using fear-based selling tactics"
+    ],
+    "max_promises": "Do not guarantee specific pricing, availability, or visa outcomes."
+}

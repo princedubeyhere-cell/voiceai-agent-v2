@@ -1,0 +1,5 @@
+{"timestamp":"2026-02-11T19:07:59.845Z","leadId":"184d7d7d-fd31-4175-9229-9555afa3de1a","type":"event","event":"call_started","clientId":"travel-agency-01","industry":"Travel Agency"}
+{"timestamp":"2026-02-11T19:07:59.846Z","leadId":"184d7d7d-fd31-4175-9229-9555afa3de1a","type":"message","role":"agent","message":"Hi there! This is Sarah from Wanderlust Travels. I noticed you were looking for travel packages. I'd love to help you plan an amazing trip!","state":"OPENING"}
+{"timestamp":"2026-02-11T19:07:59.847Z","leadId":"184d7d7d-fd31-4175-9229-9555afa3de1a","type":"message","role":"user","message":"Hi, yes I'm interested in a trip to Bali.","state":"OPENING"}
+{"timestamp":"2026-02-11T19:08:02.426Z","leadId":"184d7d7d-fd31-4175-9229-9555afa3de1a","type":"message","role":"agent","message":"That's wonderful! Bali is such a beautiful destination. Could you share when you're planning to go and how many days you'd like to stay?","state":"QUALIFICATION"}
+{"timestamp":"2026-02-11T19:08:02.427Z","leadId":"184d7d7d-fd31-4175-9229-9555afa3de1a","type":"message","role":"user","message":"It would be for me and my wife, for about 5 days.","state":"QUALIFICATION"}

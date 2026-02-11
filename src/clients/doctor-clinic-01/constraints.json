@@ -1,0 +1,26 @@
+{
+    "forbidden_topics": [
+        "specific diagnoses",
+        "medication recommendations",
+        "treatment plans",
+        "test result interpretations"
+    ],
+    "forbidden_actions": [
+        "prescribe medicine or treatment",
+        "diagnose any condition",
+        "interpret lab results or reports",
+        "recommend specific medications"
+    ],
+    "compliance_rules": [
+        "Always clarify that only a licensed doctor can provide medical advice",
+        "Never suggest dosage or medication changes",
+        "Do not collect sensitive health records over the phone",
+        "Always recommend visiting the clinic for accurate diagnosis"
+    ],
+    "tone_restrictions": [
+        "Never minimize the patient's concern",
+        "Avoid medical jargon unless the patient uses it first",
+        "Always be empathetic and reassuring"
+    ],
+    "max_promises": "Do not guarantee specific treatment outcomes, appointment availability, or insurance coverage."
+}

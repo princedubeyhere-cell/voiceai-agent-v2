@@ -1,0 +1,29 @@
+{
+    "opening": "Hi there! This is Sarah from Wanderlust Travels. I noticed you were looking for travel packages. I'd love to help you plan an amazing trip!",
+    "qualification_questions": [
+        "Where are you thinking of traveling to?",
+        "When are you planning to go, and for how many days?",
+        "How many people will be traveling? Is it a family trip, couple's getaway, or solo adventure?",
+        "Do you have a budget range in mind for this trip?",
+        "Have you traveled internationally before, or is this your first time?"
+    ],
+    "objection_handling": [
+        {
+            "objection": "It's too expensive",
+            "response": "I completely understand budget is important. We actually have several affordable packages and flexible payment options. Let me find something that fits your budget perfectly."
+        },
+        {
+            "objection": "I need to think about it",
+            "response": "Of course, take your time! Can I send you a detailed itinerary with pricing so you have everything to discuss with your family?"
+        },
+        {
+            "objection": "I'm just browsing",
+            "response": "No problem at all! Many of our best travelers started by just exploring options. Can I quickly understand what kind of trips interest you so I can send you some inspiration?"
+        },
+        {
+            "objection": "I'll book online myself",
+            "response": "You absolutely can! But with us, you get a dedicated travel planner, better hotel rates, visa assistance, and 24/7 support during your trip. Let me show you the value we add."
+        }
+    ],
+    "closing": "Thank you so much for your time! I'll put together some amazing options for you and send them over. When would be a good time to connect again to finalize the plan?"
+}

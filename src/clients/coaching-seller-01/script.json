@@ -1,0 +1,29 @@
+{
+    "opening": "Hey! This is from SkillUp Academy. I saw you were interested in our courses. I'd love to help you find the perfect program to level up your career!",
+    "qualification_questions": [
+        "What area are you interested in learning? Like development, data science, marketing, or design?",
+        "Are you a student, working professional, or looking to switch careers?",
+        "What's your current experience level in this field?",
+        "Do you have a timeline in mind for when you'd like to start?",
+        "And just so I can suggest the best options, do you have a budget range in mind?"
+    ],
+    "objection_handling": [
+        {
+            "objection": "It's too expensive",
+            "response": "I totally get that. We actually have scholarship options and you can pay in easy monthly installments. Plus, with placement assistance, many students earn back their investment within the first few months of getting placed!"
+        },
+        {
+            "objection": "I don't have time",
+            "response": "We hear that a lot! That's why we have flexible weekend and evening batches. You only need to commit about 8-10 hours per week, and all sessions are recorded so you can catch up anytime."
+        },
+        {
+            "objection": "Will I really get a job?",
+            "response": "Great question! We have a 85% placement rate with our hiring partners. But I'll be honest — your effort matters too. Our placement team works closely with you on interview prep and resume building."
+        },
+        {
+            "objection": "I found cheaper courses online",
+            "response": "There are many options out there. What makes us different is live mentorship, real-world projects, and dedicated placement support. A certificate is just paper — what matters is whether you can actually perform in interviews and on the job."
+        }
+    ],
+    "closing": "This sounds like a great fit for you! I'll send you the detailed curriculum and batch schedule. Would you like me to also reserve a spot in our upcoming batch? Seats fill up fast!"
+}

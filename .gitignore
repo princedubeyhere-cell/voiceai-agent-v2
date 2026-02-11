@@ -1,0 +1,17 @@
+# Sensitive config (contains API keys)
+config/config.json
+
+# Dependencies
+node_modules/
+
+# Database
+src/data/*.db
+
+# Audio output
+src/logs/audio/
+
+# OS files
+.DS_Store
+
+# Logs
+*.log

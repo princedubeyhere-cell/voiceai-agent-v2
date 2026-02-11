@@ -1,0 +1,30 @@
+[
+    {
+        "q": "What courses do you offer?",
+        "a": "We offer courses in Full-Stack Development, Data Science, Digital Marketing, UI/UX Design, Business Analytics, and AI/ML. All courses include live sessions, projects, and placement assistance."
+    },
+    {
+        "q": "How long are the courses?",
+        "a": "Most courses are 3 to 6 months long, depending on the program. We also have intensive bootcamps that run for 8-12 weeks."
+    },
+    {
+        "q": "What's the course fee?",
+        "a": "Our courses range from $300 to $1500 depending on the program. We also offer scholarships, early bird discounts, and flexible EMI options."
+    },
+    {
+        "q": "Do you provide placement assistance?",
+        "a": "Absolutely! We have a dedicated placement cell that helps with resume building, mock interviews, and direct connections with our 200+ hiring partners."
+    },
+    {
+        "q": "Is there a certificate?",
+        "a": "Yes, you receive an industry-recognized certificate upon completion. Our certificates are valued by major tech companies and startups."
+    },
+    {
+        "q": "Can I attend classes while working?",
+        "a": "Yes! We have weekend and evening batches specifically designed for working professionals. You also get access to recorded sessions."
+    },
+    {
+        "q": "What if I don't have a technical background?",
+        "a": "No worries at all! Many of our courses are beginner-friendly with dedicated foundation modules. Our mentors provide extra support for non-tech learners."
+    }
+]

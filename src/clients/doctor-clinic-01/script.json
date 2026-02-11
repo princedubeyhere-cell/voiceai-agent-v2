@@ -1,0 +1,29 @@
+{
+    "opening": "Hello! This is from HealthFirst Clinic. We noticed you enquired about our services. I'd like to help you schedule an appointment with the right specialist.",
+    "qualification_questions": [
+        "Could you briefly tell me what health concern you'd like to address?",
+        "Is this a new condition or have you been seeing a doctor for it already?",
+        "Do you have a preference for a particular doctor or specialty?",
+        "When would be a convenient time for your appointment?",
+        "Do you have health insurance, and if so, which provider?"
+    ],
+    "objection_handling": [
+        {
+            "objection": "I'm not sure if I need a doctor",
+            "response": "I understand. It's always better to get a professional opinion early. We can start with a quick general consultation and the doctor will advise you on next steps."
+        },
+        {
+            "objection": "It's too expensive",
+            "response": "I understand cost is a concern. Our general consultations are very affordable, and we also accept most insurance plans. Let me check what options work best for you."
+        },
+        {
+            "objection": "I'll just go to emergency",
+            "response": "Of course, if it's urgent please do visit emergency. But for non-emergency concerns, a scheduled appointment means less waiting time and more personalized attention from the doctor."
+        },
+        {
+            "objection": "I want to consult someone else first",
+            "response": "That's perfectly fine. Can I schedule a tentative appointment so you have a slot reserved? You can always reschedule if needed."
+        }
+    ],
+    "closing": "Thank you for your time. I'll confirm your appointment details via SMS and email. Please don't hesitate to call if you have any questions. Take care!"
+}
