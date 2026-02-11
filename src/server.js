@@ -65,21 +65,8 @@ app.use(globalErrorMiddleware);
 
 // ── Start Server ───────────────────────────────────────────────────────
 
-app.listen(PORT, () => {
-    console.log('');
-    console.log('╔══════════════════════════════════════════════════════╗');
-    console.log('║         🎙️  VoiceAI Agent System — RUNNING          ║');
-    console.log('╠══════════════════════════════════════════════════════╣');
-    console.log(`║  Server:    http://localhost:${PORT}                    ║`);
-    console.log('║  Endpoints:                                          ║');
-    console.log('║    POST /lead          → Accept new lead             ║');
-    console.log('║    POST /client/create → Create client profile       ║');
-    console.log('║    GET  /client/list   → List all clients            ║');
-    console.log('║    GET  /lead/logs/:id → Fetch call logs             ║');
-    console.log('║    GET  /lead/:id/path → State path history          ║');
-    console.log('║    GET  /health        → Health check                ║');
-    console.log('╚══════════════════════════════════════════════════════╝');
-    console.log('');
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
 });
 
 module.exports = app;
