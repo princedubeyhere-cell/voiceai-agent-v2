@@ -8,7 +8,12 @@
     "dev": "node --watch src/server.js",
     "simulate": "node src/simulator/simulator.js"
   },
-  "keywords": ["voice-ai", "calling-agent", "openai", "multi-client"],
+  "keywords": [
+    "voice-ai",
+    "calling-agent",
+    "openai",
+    "multi-client"
+  ],
   "author": "Prince",
   "license": "ISC",
   "dependencies": {
