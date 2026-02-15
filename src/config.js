@@ -18,6 +18,7 @@ const config = {
         port: parseInt(process.env.SERVER_PORT) || 3000,
         host: process.env.SERVER_HOST || '0.0.0.0',
         requestTimeout: parseInt(process.env.REQUEST_TIMEOUT) || 30000,
+        publicUrl: process.env.PUBLIC_URL || 'https://voiceai-agent-v2-production.up.railway.app',
     },
     call: {
         maxDurationSeconds: parseInt(process.env.CALL_MAX_DURATION) || 90,
@@ -43,6 +44,12 @@ const config = {
         penaltyPerFallback: parseFloat(process.env.PENALTY_FALLBACK) || 1.5,
         penaltyPerInterrupt: parseFloat(process.env.PENALTY_INTERRUPT) || 0.5,
         bonusForCompletion: parseFloat(process.env.BONUS_COMPLETION) || 2.0,
+    },
+    exotel: {
+        accountSid: process.env.EXOTEL_ACCOUNT_SID,
+        apiKey: process.env.EXOTEL_API_KEY,
+        apiToken: process.env.EXOTEL_API_TOKEN,
+        fromNumber: process.env.EXOTEL_FROM_NUMBER,
     },
     production: {
         safeMode: process.env.SAFE_MODE === 'true',

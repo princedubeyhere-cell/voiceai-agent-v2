@@ -31,6 +31,7 @@ const cors = require('cors');
 const config = require('./config');
 const leadRouter = require('./leads/leadRouter');
 const clientRouter = require('./leads/clientRouter');
+const webhookRouter = require('./webhooks/webhookRouter');
 const { globalErrorMiddleware } = require('./utils/errorHandler');
 const metrics = require('./utils/metrics');
 const { requestIdMiddleware, performanceMiddleware } = require('./middleware/requestTracking');
@@ -80,6 +81,7 @@ app.use((req, res, next) => {
 logger.info('Mounting routers...');
 app.use('/lead', leadRouter);
 app.use('/client', clientRouter);
+app.use('/webhooks', webhookRouter);
 logger.info('Routers mounted successfully');
 
 // Enhanced health check with deep checks

@@ -7,7 +7,10 @@ const { processLead } = require('./leadProcessor');
 const { validateLead } = require('../utils/validator');
 const { asyncHandler } = require('../utils/errorHandler');
 const db = require('../utils/db');
-const logger = require('../logs/logger');
+const logger = require('../utils/logger');
+const { makeOutboundCall } = require('../integrations/exotel');
+const metrics = require('../utils/metrics');
+const config = require('../config');
 
 const router = Router();
 
@@ -25,6 +28,43 @@ router.post('/', asyncHandler(async (req, res) => {
     }
 
     const result = await processLead(req.body);
+
+    // Track lead metric
+    metrics.incrementLead('processing');
+
+    // Trigger Exotel outbound call
+    req.logger.info('Triggering Exotel outbound call', {
+        leadId: result.leadId,
+        phone: req.body.phone,
+        clientId: req.body.clientId
+    });
+
+    // Make outbound call (non-blocking)
+    makeOutboundCall({
+        toNumber: req.body.phone,
+        fromNumber: config.exotel.fromNumber,
+        leadId: result.leadId
+    }).then(callResult => {
+        if (callResult.success) {
+            req.logger.info('Exotel call initiated successfully', {
+                leadId: result.leadId,
+                callSid: callResult.callSid
+            });
+            metrics.incrementCall('active');
+        } else {
+            req.logger.error('Exotel call failed', {
+                leadId: result.leadId,
+                error: callResult.error
+            });
+            metrics.incrementCall('failed');
+        }
+    }).catch(error => {
+        req.logger.error('Exotel call exception', {
+            leadId: result.leadId,
+            error: error.message
+        });
+        metrics.incrementCall('failed');
+    });
 
     res.status(201).json({
         success: true,
