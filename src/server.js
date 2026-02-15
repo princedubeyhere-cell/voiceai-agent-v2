@@ -31,6 +31,7 @@ const config = require('./config');
 const leadRouter = require('./leads/leadRouter');
 const clientRouter = require('./leads/clientRouter');
 const { globalErrorMiddleware } = require('./utils/errorHandler');
+const db = require('./utils/db');
 
 const app = express();
 const PORT = process.env.PORT || config.server.port || 3000;
