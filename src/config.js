@@ -44,6 +44,11 @@ const config = {
         penaltyPerInterrupt: parseFloat(process.env.PENALTY_INTERRUPT) || 0.5,
         bonusForCompletion: parseFloat(process.env.BONUS_COMPLETION) || 2.0,
     },
+    production: {
+        safeMode: process.env.SAFE_MODE === 'true',
+        logLevel: process.env.LOG_LEVEL || 'info',
+        enableMetrics: process.env.ENABLE_METRICS !== 'false',
+    },
 };
 
 module.exports = config;

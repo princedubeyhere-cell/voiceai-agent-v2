@@ -3,27 +3,28 @@
  * Main entry point. Mounts all routes with global error handling.
  */
 
+// Initialize logger first (before any logging)
+const logger = require('./utils/logger');
+
 // ── Global Error Handlers (MUST be first) ─────────────────────────────────
 process.on('uncaughtException', (err) => {
-    console.error('═══════════════════════════════════════════════════════');
-    console.error('UNCAUGHT EXCEPTION - CRITICAL ERROR');
-    console.error('Time:', new Date().toISOString());
-    console.error('Error:', err.message);
-    console.error('Stack:', err.stack);
-    console.error('═══════════════════════════════════════════════════════');
+    logger.error('UNCAUGHT EXCEPTION - CRITICAL ERROR', {
+        error: err.message,
+        stack: err.stack,
+        timestamp: new Date().toISOString()
+    });
     // Don't exit - let Railway restart if needed
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-    console.error('═══════════════════════════════════════════════════════');
-    console.error('UNHANDLED PROMISE REJECTION - WARNING');
-    console.error('Time:', new Date().toISOString());
-    console.error('Reason:', reason);
-    console.error('Promise:', promise);
-    console.error('═══════════════════════════════════════════════════════');
+    logger.error('UNHANDLED PROMISE REJECTION - WARNING', {
+        reason: reason,
+        promise: promise,
+        timestamp: new Date().toISOString()
+    });
 });
 
-console.log('[Startup] Global error handlers registered');
+logger.info('Global error handlers registered');
 
 const express = require('express');
 const cors = require('cors');
@@ -31,21 +32,31 @@ const config = require('./config');
 const leadRouter = require('./leads/leadRouter');
 const clientRouter = require('./leads/clientRouter');
 const { globalErrorMiddleware } = require('./utils/errorHandler');
+const metrics = require('./utils/metrics');
+const { requestIdMiddleware, performanceMiddleware } = require('./middleware/requestTracking');
 
-console.log('[Startup] About to require db module...');
+logger.info('About to require db module...');
 const db = require('./utils/db');
-console.log('[Startup] DB module required successfully');
+logger.info('DB module required successfully');
 
 const app = express();
 const PORT = process.env.PORT || config.server.port || 3000;
 
 // ── Environment Logging ────────────────────────────────────────────────────
-console.log('[Startup] Environment:', process.env.NODE_ENV || 'development');
-console.log('[Startup] PORT source:', process.env.PORT ? 'env.PORT' : (config.server.port ? 'config' : 'fallback'));
-console.log('[Startup] PORT value:', PORT);
-console.log('[Startup] Host:', config.server.host);
+logger.info('Server configuration', {
+    environment: process.env.NODE_ENV || 'development',
+    portSource: process.env.PORT ? 'env.PORT' : (config.server.port ? 'config' : 'fallback'),
+    port: PORT,
+    host: config.server.host,
+    safeMode: config.production.safeMode,
+    nodeVersion: process.version
+});
 
 // ── Middleware ──────────────────────────────────────────────────────────
+
+// Request tracking and performance monitoring
+app.use(requestIdMiddleware);
+app.use(performanceMiddleware);
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
@@ -54,6 +65,7 @@ app.use(express.urlencoded({ extended: true }));
 // Request timeout protection
 app.use((req, res, next) => {
     res.setTimeout(config.server.requestTimeout || 30000, () => {
+        req.logger.warn('Request timeout', { endpoint: req.path });
         res.status(408).json({
             success: false,
             error: 'Request timed out.',
@@ -63,29 +75,76 @@ app.use((req, res, next) => {
     next();
 });
 
-// Request logging
-app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-    next();
-});
-
 // ── Routes ─────────────────────────────────────────────────────────────
 
-console.log('[Startup] Mounting routers...');
+logger.info('Mounting routers...');
 app.use('/lead', leadRouter);
 app.use('/client', clientRouter);
-console.log('[Startup] Routers mounted successfully');
+logger.info('Routers mounted successfully');
 
-// Health check
-app.get('/health', (req, res) => {
-    console.log('[Health] Health check endpoint hit');
+// Enhanced health check with deep checks
+app.get('/health', async (req, res) => {
+    req.logger.info('Health check endpoint hit');
+
+    const healthStatus = {
+        success: true,
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        environment: process.env.NODE_ENV || 'development',
+        port: PORT,
+        nodeVersion: process.version,
+        safeMode: config.production.safeMode,
+        checks: {
+            database: { status: 'unknown' },
+            memory: { status: 'unknown' }
+        }
+    };
+
+    // Database connectivity check
+    try {
+        const dbHealthy = await db.healthCheck();
+        healthStatus.checks.database = {
+            status: dbHealthy ? 'healthy' : 'unhealthy',
+            connected: dbHealthy
+        };
+    } catch (error) {
+        healthStatus.checks.database = {
+            status: 'unhealthy',
+            error: error.message
+        };
+        healthStatus.success = false;
+        healthStatus.status = 'degraded';
+    }
+
+    // Memory usage check
+    const memUsage = process.memoryUsage();
+    healthStatus.checks.memory = {
+        status: 'healthy',
+        heapUsed: `${Math.round(memUsage.heapUsed / 1024 / 1024)}MB`,
+        heapTotal: `${Math.round(memUsage.heapTotal / 1024 / 1024)}MB`,
+        rss: `${Math.round(memUsage.rss / 1024 / 1024)}MB`
+    };
+
+    res.status(healthStatus.success ? 200 : 503).json(healthStatus);
+});
+
+// Metrics endpoint
+app.get('/metrics', (req, res) => {
+    req.logger.info('Metrics endpoint hit');
+
+    if (!config.production.enableMetrics) {
+        return res.status(403).json({
+            success: false,
+            error: 'Metrics endpoint disabled'
+        });
+    }
+
+    const metricsData = metrics.getMetrics();
     res.json({
         success: true,
-        status: 'running',
-        uptime: process.uptime(),
-        timestamp: new Date().toISOString(),
-        port: PORT,
-        env: process.env.NODE_ENV || 'development',
+        data: metricsData,
+        timestamp: new Date().toISOString()
     });
 });
 
@@ -103,30 +162,60 @@ app.use(globalErrorMiddleware);
 // ── Start Server ───────────────────────────────────────────────────────
 
 // Initialize database before starting server (async for PostgreSQL)
-console.log('[Startup] Initializing database...');
+logger.info('Initializing database...');
 db.initializeDatabase()
     .then(() => {
-        console.log('[Startup] Database initialized successfully');
+        logger.info('Database initialized successfully');
         startServer();
     })
     .catch((error) => {
-        console.error('[Startup] Database initialization failed:', error.message);
-        console.error('[Startup] Server will start but database operations will fail');
+        logger.error('Database initialization failed', { error: error.message });
+        logger.warn('Server will start but database operations will fail');
         startServer();
     });
 
 function startServer() {
-    console.log('[Startup] Starting server...');
-    app.listen(PORT, "0.0.0.0", () => {
-        console.log('═══════════════════════════════════════════════════════');
-        console.log('✓ SERVER STARTED SUCCESSFULLY');
-        console.log('═══════════════════════════════════════════════════════');
-        console.log(`Server running on port ${PORT}`);
-        console.log(`Server live at http://0.0.0.0:${PORT}`);
-        console.log(`Health check: http://0.0.0.0:${PORT}/health`);
-        console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-        console.log('═══════════════════════════════════════════════════════');
+    logger.info('Starting server...');
+    const server = app.listen(PORT, "0.0.0.0", () => {
+        logger.info('SERVER STARTED SUCCESSFULLY', {
+            port: PORT,
+            host: '0.0.0.0',
+            environment: process.env.NODE_ENV || 'development',
+            healthCheck: `http://0.0.0.0:${PORT}/health`,
+            metrics: `http://0.0.0.0:${PORT}/metrics`,
+            safeMode: config.production.safeMode
+        });
     });
+
+    // Graceful shutdown handlers
+    const gracefulShutdown = (signal) => {
+        logger.info(`${signal} received, starting graceful shutdown...`);
+
+        server.close(() => {
+            logger.info('HTTP server closed');
+
+            // Close database connection
+            db.closeConnection()
+                .then(() => {
+                    logger.info('Database connection closed');
+                    logger.info('Graceful shutdown complete');
+                    process.exit(0);
+                })
+                .catch((error) => {
+                    logger.error('Error closing database connection', { error: error.message });
+                    process.exit(1);
+                });
+        });
+
+        // Force shutdown after 30 seconds
+        setTimeout(() => {
+            logger.error('Forced shutdown after timeout');
+            process.exit(1);
+        }, 30000);
+    };
+
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 }
 
 module.exports = app;

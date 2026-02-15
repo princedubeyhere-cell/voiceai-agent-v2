@@ -279,4 +279,25 @@ module.exports = {
       console.log('[Database] PostgreSQL connection pool closed');
     }
   },
+
+  // Health check for monitoring
+  async healthCheck() {
+    if (!pool) {
+      return false;
+    }
+    try {
+      const client = await pool.connect();
+      await client.query('SELECT 1');
+      client.release();
+      return true;
+    } catch (error) {
+      console.error('[Database] Health check failed:', error.message);
+      return false;
+    }
+  },
+
+  // Alias for graceful shutdown
+  async closeConnection() {
+    return this.close();
+  },
 };
