@@ -98,26 +98,31 @@ app.use(globalErrorMiddleware);
 
 // ── Start Server ───────────────────────────────────────────────────────
 
-// Initialize database before starting server
+// Initialize database before starting server (async for PostgreSQL)
 console.log('[Startup] Initializing database...');
-try {
-    db.initializeDatabase();
-    console.log('[Startup] Database initialized successfully');
-} catch (error) {
-    console.error('[Startup] Database initialization failed:', error.message);
-    console.error('[Startup] Server will start but database operations will fail');
-}
+db.initializeDatabase()
+    .then(() => {
+        console.log('[Startup] Database initialized successfully');
+        startServer();
+    })
+    .catch((error) => {
+        console.error('[Startup] Database initialization failed:', error.message);
+        console.error('[Startup] Server will start but database operations will fail');
+        startServer();
+    });
 
-console.log('[Startup] Starting server...');
-app.listen(PORT, "0.0.0.0", () => {
-    console.log('═══════════════════════════════════════════════════════');
-    console.log('✓ SERVER STARTED SUCCESSFULLY');
-    console.log('═══════════════════════════════════════════════════════');
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Server live at http://0.0.0.0:${PORT}`);
-    console.log(`Health check: http://0.0.0.0:${PORT}/health`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log('═══════════════════════════════════════════════════════');
-});
+function startServer() {
+    console.log('[Startup] Starting server...');
+    app.listen(PORT, "0.0.0.0", () => {
+        console.log('═══════════════════════════════════════════════════════');
+        console.log('✓ SERVER STARTED SUCCESSFULLY');
+        console.log('═══════════════════════════════════════════════════════');
+        console.log(`Server running on port ${PORT}`);
+        console.log(`Server live at http://0.0.0.0:${PORT}`);
+        console.log(`Health check: http://0.0.0.0:${PORT}/health`);
+        console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log('═══════════════════════════════════════════════════════');
+    });
+}
 
 module.exports = app;
