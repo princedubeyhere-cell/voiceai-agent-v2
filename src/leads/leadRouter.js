@@ -42,7 +42,6 @@ router.post('/', asyncHandler(async (req, res) => {
     // Make outbound call (non-blocking)
     makeOutboundCall({
         toNumber: req.body.phone,
-        fromNumber: config.exotel.fromNumber,
         leadId: result.leadId
     }).then(callResult => {
         if (callResult.success) {

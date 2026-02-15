@@ -1,5 +1,5 @@
 /**
- * Exotel Outbound Calling Integration
+ * Exotel Outbound Calling Integration (Singapore Region)
  * Phase 1: Basic outbound dialing without AI voice streaming
  */
 
@@ -7,57 +7,56 @@ const axios = require('axios');
 const logger = require('../utils/logger');
 const config = require('../config');
 
+// Exotel Singapore Account SID
+const EXOTEL_ACCOUNT_SID = 'datawitydigitaltechnologies1';
+const EXOTEL_BASE_URL = `https://api.exotel.com/v1/Accounts/${EXOTEL_ACCOUNT_SID}/Calls/connect.json`;
+
 /**
- * Make outbound call via Exotel
+ * Make outbound call via Exotel (Singapore)
  * @param {Object} params - Call parameters
  * @param {string} params.toNumber - Recipient phone number (E.164 format)
- * @param {string} params.fromNumber - Caller ID (optional, uses config default)
  * @param {string} params.leadId - Lead ID for tracking
- * @returns {Promise<Object>} - Exotel call response
+ * @returns {Promise<Object>} - Exotel call response with Call SID
  */
-async function makeOutboundCall({ toNumber, fromNumber, leadId }) {
+async function makeOutboundCall({ toNumber, leadId }) {
     const callLogger = logger.child({ leadId, toNumber });
 
     try {
-        callLogger.info('Initiating Exotel outbound call');
+        callLogger.info('Initiating Exotel outbound call (Singapore)', {
+            accountSid: EXOTEL_ACCOUNT_SID,
+            toNumber
+        });
 
         // Validate configuration
-        if (!config.exotel.accountSid || !config.exotel.apiKey || !config.exotel.apiToken) {
-            throw new Error('Exotel credentials not configured');
+        if (!process.env.EXOTEL_API_KEY || !process.env.EXOTEL_API_TOKEN) {
+            throw new Error('Exotel API credentials not configured');
         }
 
-        // Use provided fromNumber or default from config
-        const callerNumber = fromNumber || config.exotel.fromNumber;
-
-        if (!callerNumber) {
-            throw new Error('From number not provided and no default configured');
+        if (!process.env.EXOTEL_FROM_NUMBER) {
+            throw new Error('EXOTEL_FROM_NUMBER not configured');
         }
 
-        // Exotel API endpoint
-        const apiUrl = `https://api.exotel.com/v1/Accounts/${config.exotel.accountSid}/Calls/connect.json`;
+        const fromNumber = process.env.EXOTEL_FROM_NUMBER;
 
         // Prepare request payload
-        const payload = {
-            From: callerNumber,
+        const payload = new URLSearchParams({
+            From: fromNumber,
             To: toNumber,
-            CallerId: callerNumber,
-            // StatusCallback will be set to our webhook endpoint
-            StatusCallback: `${config.server.publicUrl}/webhooks/exotel/status`,
-            // For Phase 1, we're just dialing without AI voice
-            // In Phase 2, we'll add URL for voice streaming
-        };
+            CallerId: fromNumber,
+            StatusCallback: `${config.server.publicUrl}/webhooks/exotel/status`
+        });
 
         callLogger.info('Sending Exotel API request', {
-            from: callerNumber,
+            from: fromNumber,
             to: toNumber,
-            apiUrl
+            apiUrl: EXOTEL_BASE_URL
         });
 
         // Make API request with Basic Auth
-        const response = await axios.post(apiUrl, payload, {
+        const response = await axios.post(EXOTEL_BASE_URL, payload.toString(), {
             auth: {
-                username: config.exotel.apiKey,
-                password: config.exotel.apiToken
+                username: process.env.EXOTEL_API_KEY,
+                password: process.env.EXOTEL_API_TOKEN
             },
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -69,9 +68,11 @@ async function makeOutboundCall({ toNumber, fromNumber, leadId }) {
         const callSid = callData.Call?.Sid || callData.Sid;
 
         callLogger.info('Exotel call initiated successfully', {
+            leadId,
             callSid,
             status: callData.Call?.Status || callData.Status,
-            direction: callData.Call?.Direction || callData.Direction
+            direction: callData.Call?.Direction || callData.Direction,
+            fullResponse: callData
         });
 
         return {
@@ -83,10 +84,16 @@ async function makeOutboundCall({ toNumber, fromNumber, leadId }) {
         };
 
     } catch (error) {
-        callLogger.error('Exotel call failed', {
+        callLogger.error('Exotel call failed - detailed error', {
+            leadId,
             error: error.message,
-            response: error.response?.data,
-            statusCode: error.response?.status
+            responseStatus: error.response?.status,
+            responseData: error.response?.data,
+            responseHeaders: error.response?.headers,
+            requestConfig: {
+                url: EXOTEL_BASE_URL,
+                method: 'POST'
+            }
         });
 
         return {
@@ -107,9 +114,12 @@ async function makeOutboundCall({ toNumber, fromNumber, leadId }) {
 function handleStatusWebhook(webhookData) {
     logger.info('Exotel status webhook received', {
         callSid: webhookData.CallSid,
-        status: webhookData.Status,
-        duration: webhookData.Duration,
-        dialCallStatus: webhookData.DialCallStatus
+        callStatus: webhookData.Status,
+        dialCallStatus: webhookData.DialCallStatus,
+        callDuration: webhookData.Duration,
+        conversationDuration: webhookData.ConversationDuration,
+        recordingUrl: webhookData.RecordingUrl,
+        fullWebhookData: webhookData
     });
 
     return {
@@ -117,12 +127,12 @@ function handleStatusWebhook(webhookData) {
         status: webhookData.Status,
         dialCallStatus: webhookData.DialCallStatus,
         duration: parseInt(webhookData.Duration) || 0,
+        conversationDuration: parseInt(webhookData.ConversationDuration) || 0,
         startTime: webhookData.StartTime,
         endTime: webhookData.EndTime,
         from: webhookData.From,
         to: webhookData.To,
-        recordingUrl: webhookData.RecordingUrl,
-        conversationDuration: parseInt(webhookData.ConversationDuration) || 0
+        recordingUrl: webhookData.RecordingUrl
     };
 }
 
