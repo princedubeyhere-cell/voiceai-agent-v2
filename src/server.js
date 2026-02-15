@@ -31,7 +31,10 @@ const config = require('./config');
 const leadRouter = require('./leads/leadRouter');
 const clientRouter = require('./leads/clientRouter');
 const { globalErrorMiddleware } = require('./utils/errorHandler');
+
+console.log('[Startup] About to require db module...');
 const db = require('./utils/db');
+console.log('[Startup] DB module required successfully');
 
 const app = express();
 const PORT = process.env.PORT || config.server.port || 3000;
