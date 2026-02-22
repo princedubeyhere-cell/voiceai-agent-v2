@@ -28,6 +28,7 @@ logger.info('Global error handlers registered');
 
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const config = require('./config');
 const leadRouter = require('./leads/leadRouter');
 const clientRouter = require('./leads/clientRouter');
@@ -63,6 +64,9 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, '../public')));
+
 // Request timeout protection
 app.use((req, res, next) => {
     res.setTimeout(config.server.requestTimeout || 30000, () => {
@@ -83,6 +87,19 @@ app.use('/lead', leadRouter);
 app.use('/client', clientRouter);
 app.use('/webhooks', webhookRouter);
 logger.info('Routers mounted successfully');
+
+// Root API endpoint for quick validation
+app.get('/api', (req, res) => {
+    res.json({
+        success: true,
+        message: 'VoiceAI Agent API is up and running!',
+        environment: process.env.NODE_ENV || 'development',
+        endpoints: {
+            health: '/health',
+            metrics: '/metrics'
+        }
+    });
+});
 
 // Enhanced health check with deep checks
 app.get('/health', async (req, res) => {

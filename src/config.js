@@ -3,6 +3,8 @@
  * No config.json dependency. All secrets come from process.env.
  */
 
+require('dotenv').config();
+
 const config = {
     openai: {
         apiKey: process.env.OPENAI_API_KEY,

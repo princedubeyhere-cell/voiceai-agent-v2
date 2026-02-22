@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceAI Web Client</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --panel-bg: rgba(30, 41, 59, 0.7);
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #8b5cf6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #1e1b4b);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .header { text-align: center; }
+        .header h1 { font-size: 24px; font-weight: 700; background: linear-gradient(to right, #60a5fa, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: var(--text-muted); font-size: 14px; margin-top: 8px; }
+
+        .chat-box {
+            height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 8px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message.agent {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user {
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .input-area {
+            display: flex;
+            gap: 8px;
+        }
+
+        input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 14px 16px;
+            border-radius: 12px;
+            outline: none;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+        input:focus { border-color: var(--primary); background: rgba(0, 0, 0, 0.5); }
+        input:disabled { opacity: 0.5; }
+
+        button {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4); }
+        button:active { transform: translateY(0); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .loader {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Minimal scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+
+        #callBtn {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>VoiceAI Client</h1>
+        <p>Interactive Voice Agent Simulator</p>
+    </div>
+
+    <button id="callBtn" onclick="startCall()">📞 Start Call (Doctor Clinic)</button>
+
+    <div class="chat-box" id="chatBox">
+        <div class="message agent" style="display: none;" id="welcomeMsg">Welcome to the simulator. Click Start Call.</div>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Type your response..." disabled onkeypress="handleEnter(event)">
+        <button id="sendBtn" onclick="sendMessage()" disabled>
+            <span id="btnText">Send</span>
+            <div class="loader" id="btnLoader"></div>
+        </button>
+    </div>
+</div>
+
+<audio id="audioPlayer" style="display:none;" autoplay></audio>
+
+<script>
+    let currentLeadId = null;
+    let isProcessing = false;
+
+    const chatBox = document.getElementById('chatBox');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const callBtn = document.getElementById('callBtn');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const btnText = document.getElementById('btnText');
+    const btnLoader = document.getElementById('btnLoader');
+
+    // Make sure Welcome Msg is visible initially
+    document.getElementById('welcomeMsg').style.display = 'block';
+
+    function addMessage(text, role) {
+        const div = document.createElement('div');
+        div.className = `message ${role}`;
+        div.textContent = text;
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function setLoading(loading) {
+        isProcessing = loading;
+        userInput.disabled = loading || !currentLeadId;
+        sendBtn.disabled = loading || !currentLeadId;
+        callBtn.disabled = loading || currentLeadId;
+        
+        btnText.style.display = loading ? 'none' : 'block';
+        btnLoader.style.display = loading ? 'block' : 'none';
+    }
+
+    async function startCall() {
+        setLoading(true);
+        chatBox.innerHTML = '';
+        
+        try {
+            const res = await fetch('/web-chat/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ clientId: 'doctor-clinic-01', name: 'Web User' })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                currentLeadId = data.data.leadId;
+                addMessage(data.data.greeting, 'agent');
+                playAudio(data.data.audioUrl);
+            } else {
+                addMessage('Failed to start call: ' + data.error, 'agent');
+            }
+        } catch (err) {
+            addMessage('Network completely failed: ' + err.message, 'agent');
+        }
+        setLoading(false);
+        userInput.focus();
+    }
+
+    async function sendMessage() {
+        const text = userInput.value.trim();
+        if (!text || isProcessing || !currentLeadId) return;
+
+        addMessage(text, 'user');
+        userInput.value = '';
+        setLoading(true);
+
+        try {
+            const res = await fetch('/web-chat/reply', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ leadId: currentLeadId, message: text })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                addMessage(data.data.reply, 'agent');
+                if (data.data.audioUrl) {
+                    playAudio(data.data.audioUrl);
+                }
+                
+                if (data.data.ended) {
+                    addMessage("Call ended. Generating summary...", 'agent');
+                    currentLeadId = null; // Reset for new call
+                    callBtn.disabled = false;
+                    callBtn.textContent = '📞 Start New Call';
+                }
+            } else {
+                addMessage('Error: ' + data.error, 'agent');
+            }
+        } catch (err) {
+            addMessage('Network error: ' + err.message, 'agent');
+        }
+        setLoading(false);
+        if (currentLeadId) userInput.focus();
+    }
+
+    function handleEnter(e) {
+        if (e.key === 'Enter') sendMessage();
+    }
+
+    function playAudio(url) {
+        if (!url) return;
+        audioPlayer.src = url;
+        audioPlayer.play().catch(e => console.warn("Audio autoplay blocked:", e));
+    }
+</script>
+
+</body>
+</html>

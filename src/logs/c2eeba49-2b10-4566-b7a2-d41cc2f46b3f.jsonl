@@ -1,0 +1,3 @@
+{"timestamp":"2026-02-22T16:39:03.169Z","leadId":"c2eeba49-2b10-4566-b7a2-d41cc2f46b3f","type":"event","event":"call_started","clientId":"doctor-clinic-01","industry":"Doctor/Clinic"}
+{"timestamp":"2026-02-22T16:39:03.170Z","leadId":"c2eeba49-2b10-4566-b7a2-d41cc2f46b3f","type":"message","role":"agent","message":"Hello! This is from HealthFirst Clinic. We noticed you enquired about our services. I'd like to help you schedule an appointment with the right specialist.","state":"OPENING"}
+{"timestamp":"2026-02-22T16:39:03.170Z","leadId":"c2eeba49-2b10-4566-b7a2-d41cc2f46b3f","type":"message","role":"user","message":"Hi, I've been having back pain for the last two weeks.","state":"OPENING"}
